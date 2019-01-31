@@ -1,12 +1,29 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import DOM from 'react-dom';
+import { GraphQLClient } from 'graphql-request';
 import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import Main from './Main.js';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const API_ENDPOINT = 'https://api.github.com/graphql';
+const OAUTH_ACCESS_TOKEN = '95291aeffac9bf51bf97583be58fb2dfad289a6a';
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: http://bit.ly/CRA-PWA
-serviceWorker.unregister();
+const query = `
+    query($username:String!) {
+        user(login: $username) {
+            gists(first: 20, privacy: PUBLIC) {
+                nodes {
+                    name
+                    description
+                }
+            }
+        }
+    }
+`;
+
+const client = new GraphQLClient(API_ENDPOINT, {
+    headers: {
+        Authorization: 'Bearer ' + OAUTH_ACCESS_TOKEN
+    }
+});
+
+DOM.render(<Main client={ client } query={ query }/>, document.querySelector('#root'));
