@@ -3,8 +3,8 @@ import Gist from './Gist.js';
 
 export default class Panel extends React.Component {
     render() {
-        const gists = this.props.parent.state.gists.map(g => 
-            <Gist name={ g.name } description={ g.description }/>
+        const gists = this.props.parent.state.gists.map((g, i) => 
+            <Gist key={ i } name={ g.name } description={ g.description }/>
         )
         return (
             <React.Fragment>

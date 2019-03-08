@@ -17,12 +17,40 @@ export default class UserInput extends React.Component {
             }
         }
 
+        this.timeout = null;
+
         this.handleChange = this.handleChange.bind(this);
+        this.fetchInfo = this.fetchInfo.bind(this);
+    }
+
+    async fetchInfo() {
+        try {
+            const { username } = this.state;
+            const data = await this.props.client.request(this.props.query, { username });
+            if(this.state.username !== username) return; // Handle overwrites
+            this.props.parent.setState(() => {
+                const { nodes } = data.user.gists;
+                return { 
+                    gists: nodes,
+                    message: nodes.length ? messages.okay : messages.noGists
+                };
+            })
+        } catch(err) {
+            // console.error(err.stack);
+            this.props.parent.setState(() => {
+                return { 
+                    gists: [], 
+                    message: messages.notFound 
+                };
+            })
+        }
     }
 
     handleChange(e) {
         // e.persist();
         const username = e.target.value;
+        clearTimeout(this.timeout);
+        this.timeout = setTimeout(this.fetchInfo, 200);
         this.setState(() => {
             return { 
                 username,  
@@ -30,34 +58,14 @@ export default class UserInput extends React.Component {
                     width: `${Math.max(username.length, 6) * 1.8}rem`
                 }
             };
-        }, async () => {
-            console.log(this.state);
-            try {
-                const data = await this.props.client.request(this.props.query, { username: this.state.username });
-                this.props.parent.setState(() => {
-                    const { nodes } = data.user.gists;
-                    return { 
-                        gists: nodes,
-                        message: nodes.length ? messages.okay : messages.noGists
-                    };
-                }, () => {
-                    console.log(data);
-                })
-            } catch(err) {
-                console.error(err.stack);
-                this.props.parent.setState(() => {
-                    return { 
-                        gists: [], 
-                        message: messages.notFound 
-                    };
-                })
-            }
         })
     }
 
+    /*
     componentDidMount() {
         console.log('Test 1');
     }
+    */
 
     render() {
         return (

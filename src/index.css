@@ -3,7 +3,10 @@ html, body {
     margin: 0;
     background: linear-gradient(to right, #2193b0, #6dd5ed);
     color: #ededed;
-    overflow-y: hidden;
+    /* 
+    Not sure why I had this in the first place
+    overflow-y: hidden; 
+    */
 }
 
 * {
